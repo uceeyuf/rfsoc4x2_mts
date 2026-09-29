@@ -9,6 +9,8 @@
 
 Multi-tile synchronization (MTS) of the RF data converter on the RFSoC 4x2, bare metal over JTAG (no PYNQ), checked with a two-channel loopback at **4.0 GSPS**: **DAC_A (tile 230) → ADC_B (tile 226)** and **DAC_B (tile 228) → ADC_D (tile 224)**. Both DACs play the same waveform and both ADCs capture on the same fabric cycle, so the delay between the two received channels contains the DAC and ADC tile skew.
 
+On top of MTS, a wideband chirp training sequence and a sub-sample cross-correlation estimator measure the residual skew between the channels, and a closed-loop correction with the RFDC coarse delay removes it to the nearest sample.
+
 Measured on the board: without MTS the delay changes by up to about 100 samples every time the tiles restart; with MTS it is a constant **−1.00 sample (−251 ps)**, and a short training after MTS removes that too: **−0.002 samples (−0.5 ps)** in every run.
 
 　
@@ -91,6 +93,8 @@ URAM player / capture blocks and the design approach: [Xilinx/RFSoC-MTS](https:/
 ===========================
 
 在 RFSoC 4x2 上实现 RF 数据转换器的多 tile 同步（MTS），裸机运行、JTAG 加载，不依赖 PYNQ，用 **4.0 GSPS** 双通道环回验证：**DAC_A（tile 230）→ ADC_B（tile 226）**，**DAC_B（tile 228）→ ADC_D（tile 224）**。两个 DAC 播放同一波形，两个 ADC 在同一 fabric 周期开始采集，所以两路接收信号之间的延迟包含了 DAC 和 ADC 的 tile 间偏差。
+
+在 MTS 之上，用宽带 chirp 训练序列和亚采样点精度的互相关估计器测量两路之间剩余的偏差，再用 RFDC 粗延迟做闭环校正，精确到一个采样点。
 
 上板实测：不开 MTS 时每次重启 tile 延迟变化可达约 100 个采样点；开 MTS 后固定为 **−1.00 个采样点（−251 ps）**，MTS 后再做一次训练对齐，每次都是 **−0.002 个采样点（−0.5 ps）**。
 

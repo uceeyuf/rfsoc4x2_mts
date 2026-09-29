@@ -1,0 +1,12 @@
+build/
+*.log
+*.jou
+.Xil/
+sw/vitis_ws/
+sw/*.txt
+out*/
+__pycache__/
+sim/xsim.dir/
+sim/*.pb
+sim/webtalk*
+build_console.txt

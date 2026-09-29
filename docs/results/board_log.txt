@@ -1,0 +1,127 @@
+
+==== RFSoC4x2 multi-tile sync: DAC 228/230 -> ADC 224/226, 4.0 GSPS ====
+Programming LMK04828 / LMX2594 (500 MHz) over SPI0...
+LMK end
+LMX1 end
+LMX2 end
+PL_CLK 495.063 MHz, SYSREF 4.950 MHz
+PL clock: MMCM locked, SYSREF present
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+DAC tile 228 (DAC_B)  state 0xF clock from tile 2 | ADC tile 224 (ADC_C/D)  state 0xF clock from tile 2
+DAC tile 229          state 0xF clock from tile 2 | ADC tile 225            state 0xC clock from tile 2
+DAC tile 230 (DAC_A)  state 0xF PLL locked | ADC tile 226 (ADC_A/B)  state 0xF PLL locked
+DAC tile 231          state 0xF clock from tile 2 | ADC tile 227            state 0xC clock from tile 2
+MTS: not synchronized
+DAC waveform: chirp 100 -> 1500 MHz every 4096 samples, half scale
+
+keys: 1 sine 250 MHz | 2 chirp 100 MHz -> 1.5 GHz | p DAC play on/off
+      c capture + measure | m run MTS | r restart tiles (clears MTS)
+      x experiment: 5 x (restart, capture, MTS, capture) | s status | h help
+      k reprogram the clock chips (if LMK PLL1 was still settling at power-on)
+wiring: DAC_A -> ADC_B, DAC_B -> ADC_D
+
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+tiles restarted (MTS alignment cleared)
+level:  ADC_D   4060  ADC_C     24  ADC_B   4024  ADC_A     28  (rms, full scale 32767)
+delay ADC_D vs ADC_B:  +41.980 samples = +10494.9 ps  (inverted polarity)
+MTS DAC tiles 0x5: ok, ADC tiles 0x5: ok
+DAC tile 228 (DAC_B)  state 0xF clock from tile 2 | ADC tile 224 (ADC_C/D)  state 0xF clock from tile 2
+DAC tile 229          state 0xF clock from tile 2 | ADC tile 225            state 0xC clock from tile 2
+DAC tile 230 (DAC_A)  state 0xF PLL locked | ADC tile 226 (ADC_A/B)  state 0xF PLL locked
+DAC tile 231          state 0xF clock from tile 2 | ADC tile 227            state 0xC clock from tile 2
+MTS: DAC latency tile0 120 tile2 120 (offset 0 / 8), ADC latency tile0 88 tile2 88 (offset 0 / 0)
+level:  ADC_D   4939  ADC_C     25  ADC_B   5027  ADC_A     27  (rms, full scale 32767)
+delay ADC_D vs ADC_B:   -1.004 samples =   -251.0 ps  (inverted polarity)
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+tiles restarted (MTS alignment cleared)
+level:  ADC_D   4518  ADC_C     24  ADC_B   4774  ADC_A     28  (rms, full scale 32767)
+delay ADC_D vs ADC_B:  -94.943 samples = -23735.6 ps  (inverted polarity)
+MTS DAC tiles 0x5: ok, ADC tiles 0x5: ok
+DAC tile 228 (DAC_B)  state 0xF clock from tile 2 | ADC tile 224 (ADC_C/D)  state 0xF clock from tile 2
+DAC tile 229          state 0xF clock from tile 2 | ADC tile 225            state 0xC clock from tile 2
+DAC tile 230 (DAC_A)  state 0xF PLL locked | ADC tile 226 (ADC_A/B)  state 0xF PLL locked
+DAC tile 231          state 0xF clock from tile 2 | ADC tile 227            state 0xC clock from tile 2
+MTS: DAC latency tile0 120 tile2 120 (offset 0 / 8), ADC latency tile0 88 tile2 88 (offset 0 / 0)
+level:  ADC_D   4939  ADC_C     23  ADC_B   5029  ADC_A     28  (rms, full scale 32767)
+delay ADC_D vs ADC_B:   -1.004 samples =   -251.1 ps  (inverted polarity)
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+tiles restarted (MTS alignment cleared)
+level:  ADC_D   4262  ADC_C     24  ADC_B   4273  ADC_A     24  (rms, full scale 32767)
+delay ADC_D vs ADC_B:  +13.437 samples =  +3359.3 ps  (inverted polarity)
+MTS DAC tiles 0x5: ok, ADC tiles 0x5: ok
+DAC tile 228 (DAC_B)  state 0xF clock from tile 2 | ADC tile 224 (ADC_C/D)  state 0xF clock from tile 2
+DAC tile 229          state 0xF clock from tile 2 | ADC tile 225            state 0xC clock from tile 2
+DAC tile 230 (DAC_A)  state 0xF PLL locked | ADC tile 226 (ADC_A/B)  state 0xF PLL locked
+DAC tile 231          state 0xF clock from tile 2 | ADC tile 227            state 0xC clock from tile 2
+MTS: DAC latency tile0 120 tile2 120 (offset 0 / 8), ADC latency tile0 88 tile2 88 (offset 0 / 0)
+level:  ADC_D   4938  ADC_C     24  ADC_B   5028  ADC_A     25  (rms, full scale 32767)
+delay ADC_D vs ADC_B:   -1.003 samples =   -250.8 ps  (inverted polarity)
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+tiles restarted (MTS alignment cleared)
+level:  ADC_D   4874  ADC_C     22  ADC_B   5042  ADC_A     28  (rms, full scale 32767)
+delay ADC_D vs ADC_B:  -29.996 samples =  -7499.0 ps  (inverted polarity)
+MTS DAC tiles 0x5: ok, ADC tiles 0x5: ok
+DAC tile 228 (DAC_B)  state 0xF clock from tile 2 | ADC tile 224 (ADC_C/D)  state 0xF clock from tile 2
+DAC tile 229          state 0xF clock from tile 2 | ADC tile 225            state 0xC clock from tile 2
+DAC tile 230 (DAC_A)  state 0xF PLL locked | ADC tile 226 (ADC_A/B)  state 0xF PLL locked
+DAC tile 231          state 0xF clock from tile 2 | ADC tile 227            state 0xC clock from tile 2
+MTS: DAC latency tile0 120 tile2 120 (offset 0 / 8), ADC latency tile0 88 tile2 88 (offset 0 / 0)
+level:  ADC_D   4939  ADC_C     23  ADC_B   5030  ADC_A     29  (rms, full scale 32767)
+delay ADC_D vs ADC_B:   -1.003 samples =   -250.9 ps  (inverted polarity)
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 3 timed out at state 12 in XRFdc_WaitForRestartClr
+metal: 
+ ADC 1 timed out at state 12 in XRFdc_WaitForRestartClr
+tiles restarted (MTS alignment cleared)
+level:  ADC_D   4261  ADC_C     24  ADC_B   4209  ADC_A     24  (rms, full scale 32767)
+delay ADC_D vs ADC_B:  -70.564 samples = -17640.9 ps  (inverted polarity)
+MTS DAC tiles 0x5: ok, ADC tiles 0x5: ok
+DAC tile 228 (DAC_B)  state 0xF clock from tile 2 | ADC tile 224 (ADC_C/D)  state 0xF clock from tile 2
+DAC tile 229          state 0xF clock from tile 2 | ADC tile 225            state 0xC clock from tile 2
+DAC tile 230 (DAC_A)  state 0xF PLL locked | ADC tile 226 (ADC_A/B)  state 0xF PLL locked
+DAC tile 231          state 0xF clock from tile 2 | ADC tile 227            state 0xC clock from tile 2
+MTS: DAC latency tile0 120 tile2 120 (offset 0 / 8), ADC latency tile0 88 tile2 88 (offset 0 / 0)
+level:  ADC_D   4939  ADC_C     24  ADC_B   5027  ADC_A     25  (rms, full scale 32767)
+delay ADC_D vs ADC_B:   -1.003 samples =   -250.8 ps  (inverted polarity)
+
+run | ADC_D vs ADC_B without MTS | with MTS  (samples, 1 sample = 250 ps)
+ 1  |    +41.980                 |     -1.004
+ 2  |    -94.943                 |     -1.004
+ 3  |    +13.437                 |     -1.003
+ 4  |    -29.996                 |     -1.003
+ 5  |    -70.564                 |     -1.003

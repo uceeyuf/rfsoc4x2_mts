@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" font-family="Segoe UI, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+    <style>
+      rect{stroke-width:1.4;rx:6;ry:6}
+      .ps{fill:#e8f0fe;stroke:#4a78c2}
+      .pl{fill:#eaf6ea;stroke:#3f8f3f}
+      .new{fill:#fff3dc;stroke:#d08a00}
+      .rf{fill:#fde8e8;stroke:#c24a4a}
+      .clk{fill:#f1f1f1;stroke:#777}
+      line,path.l{stroke:#444;stroke-width:1.4;fill:none;marker-end:url(#a)}
+      path.s{stroke:#d08a00;stroke-width:1.2;fill:none;stroke-dasharray:5 4;marker-end:url(#a)}
+      .t{text-anchor:middle}
+      .x{font-size:11px;fill:#555;text-anchor:middle}
+    </style>
+  </defs>
+
+  <!-- PS -->
+  <rect class="ps" x="15" y="120" width="140" height="150"/>
+  <text class="t" x="85" y="143">PS (A53)</text>
+  <text class="x" x="85" y="166">SPI0: LMK04828 +</text>
+  <text class="x" x="85" y="181">2 x LMX2594, 500 MHz</text>
+  <text class="x" x="85" y="203">RFDC start-up + MTS</text>
+  <text class="x" x="85" y="225">waveform, capture,</text>
+  <text class="x" x="85" y="240">delay measurement</text>
+  <text class="x" x="85" y="262">JTAG + UART1</text>
+
+  <!-- DAC path -->
+  <rect class="pl" x="190" y="30" width="130" height="56"/>
+  <text class="t" x="255" y="53">URAM player</text><text class="x" x="255" y="71">64 k samples, 250 MHz</text>
+  <rect class="pl" x="345" y="30" width="130" height="56"/>
+  <text class="t" x="410" y="53">broadcast</text><text class="x" x="410" y="71">8 samples @ 500 MHz</text>
+  <rect class="rf" x="505" y="10" width="130" height="40"/>
+  <text class="t" x="570" y="35">DAC_A tile 230</text>
+  <rect class="rf" x="505" y="62" width="130" height="40"/>
+  <text class="t" x="570" y="87">DAC_B tile 228</text>
+
+  <!-- ADC path -->
+  <rect class="rf" x="505" y="250" width="130" height="40"/>
+  <text class="t" x="570" y="275">ADC_B tile 226</text>
+  <rect class="rf" x="505" y="302" width="130" height="40"/>
+  <text class="t" x="570" y="327">ADC_D tile 224</text>
+  <rect class="new" x="345" y="262" width="130" height="68"/>
+  <text class="t" x="410" y="285">capture window</text><text class="x" x="410" y="303">opens on a SYSREF edge,</text><text class="x" x="410" y="317">same cycle for all ADCs</text>
+  <rect class="pl" x="190" y="266" width="130" height="60"/>
+  <text class="t" x="255" y="290">URAM captures</text><text class="x" x="255" y="308">4 x 64 k samples</text>
+
+  <!-- loop cables -->
+  <path class="l" d="M635,30 H720 V270 H635"/>
+  <path class="l" d="M635,82 H760 V322 H635"/>
+  <text x="768" y="170" font-size="12">SMA cables</text>
+  <text x="768" y="186" font-size="12">DAC_A -> ADC_B</text>
+  <text x="768" y="202" font-size="12">DAC_B -> ADC_D</text>
+
+  <!-- clocking -->
+  <rect class="clk" x="190" y="150" width="285" height="72"/>
+  <text class="t" x="332" y="172">PL_CLK 500 MHz -> MMCM: 500 / 250 MHz</text>
+  <text class="x" x="332" y="192">PL_SYSREF -> user_sysref_adc / dac</text>
+  <text class="x" x="332" y="208">tile 2 PLL (500 MHz ref) -> 4 GHz to tiles 1, 0</text>
+
+  <line x1="155" y1="140" x2="190" y2="70"/>
+  <line x1="320" y1="58" x2="345" y2="58"/>
+  <line x1="475" y1="50" x2="505" y2="32"/>
+  <line x1="475" y1="66" x2="505" y2="80"/>
+  <line x1="505" y1="275" x2="475" y2="286"/>
+  <line x1="505" y1="322" x2="475" y2="310"/>
+  <line x1="345" y1="296" x2="320" y2="296"/>
+  <line x1="190" y1="296" x2="155" y2="250"/>
+  <path class="s" d="M410,222 V262"/>
+
+  <rect class="new" x="190" y="352" width="14" height="12"/><text x="210" y="362" font-size="11" fill="#555">new in this port</text>
+  <rect class="pl" x="330" y="352" width="14" height="12"/><text x="350" y="362" font-size="11" fill="#555">from RFSoC-MTS (DACRAMstreamer, ADCRAMcapture) / Xilinx IP</text>
+</svg>

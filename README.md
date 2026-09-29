@@ -81,6 +81,24 @@ host/           plot_captures.py
 
 　
 
+## Citation
+
+If this work helps your research, please cite it:
+
+```bibtex
+@misc{yu2026rfsoc4x2_mts,
+    author = {Yijie Yu},
+    title = {{RFSoC 4x2 Multi-Tile Synchronization}},
+    year = {2026},
+    howpublished = {\url{https://github.com/uceeyuf/rfsoc4x2_mts}},
+    note = {GitHub repository},
+}
+```
+
+GitHub also offers the citation under **Cite this repository** (from [CITATION.cff](CITATION.cff)).
+
+　
+
 ## Credits
 
 URAM player / capture blocks and the design approach: [Xilinx/RFSoC-MTS](https://github.com/Xilinx/RFSoC-MTS) (MIT, `third_party/rfsoc_mts/LICENSE`); clock register values: PYNQ RFSoC4x2 `LMK04828_500.0` / `LMX2594_500.0`; SPI driver from [RFSoC4x2_clock_LMK_LMX](https://github.com/uceeyuf/RFSoC4x2_clock_LMK_LMX); RF data converter driver: Xilinx `rfdc`. Everything else: BSD 3-Clause, Copyright (c) 2026, Yijie Yu.
@@ -163,6 +181,24 @@ sw/src/         main.c, rf_mts.c（RFDC + MTS）, align.c（训练对齐）, cap
 sim/            tb_mts_sync.v, run_sim.bat
 host/           plot_captures.py
 ```
+
+　
+
+## 引用
+
+如果这个项目对你的研究有帮助，请引用：
+
+```bibtex
+@misc{yu2026rfsoc4x2_mts,
+    author = {Yijie Yu},
+    title = {{RFSoC 4x2 Multi-Tile Synchronization}},
+    year = {2026},
+    howpublished = {\url{https://github.com/uceeyuf/rfsoc4x2_mts}},
+    note = {GitHub repository},
+}
+```
+
+GitHub 仓库页的 **Cite this repository** 也提供同样的引用（来自 [CITATION.cff](CITATION.cff)）。
 
 　
 

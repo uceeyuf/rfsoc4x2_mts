@@ -19,6 +19,7 @@
 #include "rf_mts.h"
 #include "capture.h"
 #include "align.h"
+#include "ofdm.h"
 
 static int playing;
 
@@ -27,6 +28,9 @@ static void help(void)
     xil_printf("\r\nkeys: 1 sine 250 MHz | 2 chirp 100 MHz -> 1.5 GHz | p DAC play on/off\r\n"
                "      c capture + measure | m run MTS | r restart tiles (clears MTS)\r\n"
                "      a align by training (after MTS) | d coarse delay sweep\r\n"
+               "      o OFDM: next modulation (QPSK / 16 / 64 / 256-QAM), I -> DAC_A, Q -> DAC_B\r\n"
+               "      e OFDM receive | f OFDM experiment: without MTS, MTS, MTS + align\r\n"
+               "      l OFDM level +0.05 FS | L OFDM EVM vs level sweep\r\n"
                "      x experiment: 5 x (restart, measure, MTS, measure, align) | s status | h help\r\n"
                "      k reprogram the clock chips (if LMK PLL1 was still settling at power-on)\r\n"
                "wiring: DAC_A -> ADC_B, DAC_B -> ADC_D\r\n\r\n");
@@ -46,6 +50,56 @@ static void measure(double *lag)
 {
     capture();
     analyze(lag);
+}
+
+static void ofdm_experiment(void)
+{
+    static const char *cond[3] = {"without MTS", "MTS", "MTS + align"};
+    ofdm_result r[3];
+    int m = ofdm_bits_per_sym();
+    for (int i = 0; i < 3; i++) {
+        if (i == 0) {
+            rf_reset_tiles();
+            align_clear();
+        } else if (i == 1) {
+            rf_mts();
+        } else {
+            wave_chirp(100e6, 1500e6);      /* training needs the chirp on both rails */
+            align_train();
+        }
+        ofdm_tx(m);
+        usleep(100000);
+        ofdm_rx(&r[i]);
+        ofdm_print(&r[i]);
+    }
+    printf("\r\n%d-QAM, %.2f Gb/s | Q lag | image rej. | linear EQ EVM / errors | widely linear EQ EVM / errors\r\n",
+           1 << m, ofdm_rate_gbps(m));
+    for (int i = 0; i < 3; i++)
+        printf("%-12s |  %+4d | %7.1f dB | %6.1f dB %7d        | %6.1f dB %7d\r\n", cond[i], r[i].q_lag,
+               r[i].irr_db, r[i].evm_lin_db, r[i].err_lin, r[i].evm_wl_db, r[i].err_wl);
+    printf("(%d bits per frame)\r\n", r[0].bits);
+}
+
+/* EVM vs transmit level for the current modulation: noise at low level, distortion at high */
+static void level_sweep(void)
+{
+    static const double lv[] = {0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40};
+    enum { NL = sizeof(lv) / sizeof(lv[0]) };
+    ofdm_result r[NL];
+    double keep = ofdm_level();
+    int m = ofdm_bits_per_sym();
+    for (int i = 0; i < NL; i++) {
+        ofdm_set_level(lv[i]);
+        ofdm_tx(m);
+        usleep(100000);
+        ofdm_rx(&r[i]);
+    }
+    printf("\r\n%d-QAM | RMS per rail (FS) | linear EQ EVM / errors | widely linear EQ EVM / errors\r\n", 1 << m);
+    for (int i = 0; i < NL; i++)
+        printf("        | %.2f              | %6.1f dB %7d        | %6.1f dB %7d\r\n",
+               lv[i], r[i].evm_lin_db, r[i].err_lin, r[i].evm_wl_db, r[i].err_wl);
+    ofdm_set_level(keep);
+    ofdm_tx(m);
 }
 
 static void experiment(void)
@@ -98,6 +152,27 @@ int main(void)
         case 'r': rf_reset_tiles(); align_clear(); break;
         case 'a': align_train(); break;
         case 'd': align_sweep(); break;
+        case 'o': {
+            static const int mods[4] = {2, 4, 6, 8};
+            static int mi = 0;
+            mi = (mi + 1) % 4;
+            ofdm_tx(mods[mi]);
+            break;
+        }
+        case 'e': {
+            ofdm_result r;
+            ofdm_rx(&r);
+            ofdm_print(&r);
+            break;
+        }
+        case 'f': ofdm_experiment(); break;
+        case 'l': {
+            double lv = ofdm_level() + 0.05;
+            ofdm_set_level(lv > 0.401 ? 0.10 : lv);
+            ofdm_tx(ofdm_bits_per_sym());
+            break;
+        }
+        case 'L': level_sweep(); break;
         case 'x': experiment(); break;
         case 's': rf_status(); break;
         case 'k':

@@ -3,7 +3,7 @@
 #   vivado -mode batch -source scripts/make_project.tcl                 (project + block design)
 #   vivado -mode batch -source scripts/make_project.tcl -tclargs build  (+ bitstream + .xsa)
 #
-# 4.0 GSPS. DAC tiles 228 (DAC_B) and 230 (DAC_A) play one waveform from URAM; ADC tiles
+# 4.0 GSPS. DAC tiles 230 (DAC_A = I) and 228 (DAC_B = Q) play from one URAM; ADC tiles
 # 224 (ADC_D, ADC_C) and 226 (ADC_B, ADC_A) are captured into URAM, 64 k samples each,
 # on the same SYSREF-aligned fabric cycle. Tile 2 PLLs run from the 500 MHz LMX2594
 # reference and distribute the sample clock to tiles 1 and 0. PL_CLK / PL_SYSREF come
@@ -179,9 +179,9 @@ connect_bd_net [get_bd_pins rst_ps/interconnect_aresetn] [get_bd_pins ctrl_inter
 connect_bd_net $rstn_ps [get_bd_pins ctrl_interconnect/S00_ARESETN]
 
 # URAM-backed memory (AXI BRAM controller on port A, streamer / capture on port B)
-proc make_uram {name} {
+proc make_uram {name {width 256}} {
     set ctrl [create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl ${name}_ctrl]
-    set_property -dict [list CONFIG.DATA_WIDTH {256} CONFIG.SINGLE_PORT_BRAM {1} \
+    set_property -dict [list CONFIG.DATA_WIDTH $width CONFIG.SINGLE_PORT_BRAM {1} \
         CONFIG.ECC_TYPE {0} CONFIG.READ_LATENCY {3}] $ctrl
     set mem [create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen ${name}_mem]
     set_property -dict [list CONFIG.Memory_Type {True_Dual_Port_RAM} \
@@ -192,10 +192,12 @@ proc make_uram {name} {
     connect_bd_intf_net [get_bd_intf_pins ${name}_ctrl/BRAM_PORTA] [get_bd_intf_pins ${name}_mem/BRAM_PORTA]
 }
 
-# DAC player: URAM (250 MHz, 256 bit) -> 500 MHz, 128 bit -> tiles 0, 1, 2
-make_uram dac_play
+# DAC player: URAM (250 MHz, 512 bit) -> 500 MHz, 256 bit = {DAC_B 8 samples, DAC_A 8 samples}.
+# I (DAC_A, tile 230) and Q (DAC_B, tile 228) travel in the same beat through one clock
+# converter, so the player adds no skew between them. Memory: blocks of 8 I then 8 Q samples.
+make_uram dac_play 512
 create_bd_cell -type module -reference DACRAMstreamer dac_streamer
-set_property CONFIG.MEM_SIZE_BYTES {131072} [get_bd_cells dac_streamer]
+set_property -dict [list CONFIG.DWIDTH {512} CONFIG.MEM_SIZE_BYTES {262144}] [get_bd_cells dac_streamer]
 connect_bd_intf_net [get_bd_intf_pins dac_streamer/BRAM_A] [get_bd_intf_pins dac_play_mem/BRAM_PORTB]
 set nvec [create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant dac_nvec]
 set_property -dict [list CONFIG.CONST_WIDTH {12} CONFIG.CONST_VAL {0xFFF}] $nvec
@@ -205,9 +207,12 @@ connect_bd_net [get_bd_pins gpio_play/Dout] [get_bd_pins dac_streamer/enable]
 set dcc [create_bd_cell -type ip -vlnv xilinx.com:ip:axis_clock_converter dac_cc]
 set_property CONFIG.IS_ACLK_ASYNC {1} $dcc
 set ddw [create_bd_cell -type ip -vlnv xilinx.com:ip:axis_dwidth_converter dac_dw]
-set_property CONFIG.M_TDATA_NUM_BYTES {16} $ddw
+set_property CONFIG.M_TDATA_NUM_BYTES {32} $ddw
 set bc [create_bd_cell -type ip -vlnv xilinx.com:ip:axis_broadcaster dac_bcast]
-set_property -dict [list CONFIG.NUM_MI {4} CONFIG.S_TDATA_NUM_BYTES {16} CONFIG.M_TDATA_NUM_BYTES {16}] $bc
+set_property -dict [list CONFIG.NUM_MI {4} CONFIG.S_TDATA_NUM_BYTES {32} CONFIG.M_TDATA_NUM_BYTES {16}] $bc
+set_property -dict [list CONFIG.M00_TDATA_REMAP {tdata[255:128]} CONFIG.M01_TDATA_REMAP {tdata[255:128]} \
+    CONFIG.M02_TDATA_REMAP {tdata[127:0]} CONFIG.M03_TDATA_REMAP {tdata[127:0]}] $bc
+# s00 / s10: DAC tiles 0 / 1 (DAC_B = Q), s20 / s30: DAC tiles 2 / 3 (DAC_A = I)
 connect_bd_intf_net [get_bd_intf_pins dac_streamer/axis] [get_bd_intf_pins dac_cc/S_AXIS]
 connect_bd_intf_net [get_bd_intf_pins dac_cc/M_AXIS] [get_bd_intf_pins dac_dw/S_AXIS]
 connect_bd_intf_net [get_bd_intf_pins dac_dw/M_AXIS] [get_bd_intf_pins dac_bcast/S_AXIS]
@@ -270,7 +275,7 @@ set addr_map {
     usp_rf_data_converter_0/s_axi   0xA0000000 256K
     gpio_ctrl/S_AXI                 0xA0040000 4K
     gpio_meter/S_AXI                0xA0041000 4K
-    dac_play_ctrl/S_AXI             0xA0100000 128K
+    dac_play_ctrl/S_AXI             0xA0100000 256K
     cap0_ctrl/S_AXI                 0xA0200000 128K
     cap1_ctrl/S_AXI                 0xA0280000 128K
     cap2_ctrl/S_AXI                 0xA0300000 128K

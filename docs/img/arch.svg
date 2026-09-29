@@ -22,16 +22,16 @@
   <text class="t" x="85" y="143">PS (A53)</text>
   <text class="x" x="85" y="166">SPI0: LMK04828 +</text>
   <text class="x" x="85" y="181">2 x LMX2594, 500 MHz</text>
-  <text class="x" x="85" y="203">RFDC, MTS + alignment</text>
+  <text class="x" x="85" y="203">MTS, alignment, OFDM</text>
   <text class="x" x="85" y="225">waveform, capture,</text>
-  <text class="x" x="85" y="240">delay measurement</text>
+  <text class="x" x="85" y="240">delay, OFDM demod</text>
   <text class="x" x="85" y="262">JTAG + UART1</text>
 
   <!-- DAC path -->
   <rect class="pl" x="190" y="30" width="130" height="56"/>
-  <text class="t" x="255" y="53">URAM player</text><text class="x" x="255" y="71">64 k samples, 250 MHz</text>
+  <text class="t" x="255" y="53">URAM player</text><text class="x" x="255" y="71">I + Q, 512 bit, 250 MHz</text>
   <rect class="pl" x="345" y="30" width="130" height="56"/>
-  <text class="t" x="410" y="53">broadcast</text><text class="x" x="410" y="71">8 samples @ 500 MHz</text>
+  <text class="t" x="410" y="53">I / Q split</text><text class="x" x="410" y="71">8 I + 8 Q @ 500 MHz</text>
   <rect class="rf" x="505" y="10" width="130" height="40"/>
   <text class="t" x="570" y="35">DAC_A tile 230</text>
   <rect class="rf" x="505" y="62" width="130" height="40"/>

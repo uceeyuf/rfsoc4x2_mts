@@ -3,7 +3,8 @@
  *
  * GPIO (0xA0040000) ch1: [0] DAC play, [1] capture request, [2] capture arm, [3] MMCM reset
  *                   ch2: [0] MMCM locked, [1] toggles on every SYSREF edge
- * Memories: DAC player 0xA0100000, captures 0xA0200000 + i * 0x80000, 64 k int16 each.
+ * Memories: DAC player 0xA0100000 (64 k samples each for DAC_A = I and DAC_B = Q, in blocks
+ * of 8 I then 8 Q), captures 0xA0200000 + i * 0x80000, 64 k int16 each.
  *
  * Copyright (c) 2026, Yijie Yu. BSD-3-Clause.
  */
@@ -85,11 +86,19 @@ int pl_clock_start(void)
 
 void dac_play(int on) { gpio_set(BIT_PLAY, on); }
 
-static void dac_write(const s16 *w)
+void dac_write_iq(const s16 *i, const s16 *q)
 {
-    for (int i = 0; i < NSAMP; i += 2)
-        Xil_Out32(DAC_MEM_BASE + i * 2, (u16)w[i] | ((u32)(u16)w[i + 1] << 16));
+    /* 32-byte blocks: 8 samples for DAC_A (I), then 8 for DAC_B (Q) */
+    for (int n = 0; n < NSAMP; n += 8) {
+        UINTPTR a = DAC_MEM_BASE + n * 4;
+        for (int j = 0; j < 8; j += 2) {
+            Xil_Out32(a + j * 2, (u16)i[n + j] | ((u32)(u16)i[n + j + 1] << 16));
+            Xil_Out32(a + 16 + j * 2, (u16)q[n + j] | ((u32)(u16)q[n + j + 1] << 16));
+        }
+    }
 }
+
+static void dac_write(const s16 *w) { dac_write_iq(w, w); }
 
 void wave_sine(double f_hz)
 {

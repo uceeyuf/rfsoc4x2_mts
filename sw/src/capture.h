@@ -20,6 +20,7 @@ extern const char *ch_name[NCH];
 int  pl_clock_start(void);              /* measure PL_CLK, reset the MMCM, wait for lock and SYSREF */
 int  pl_clock_ok(void);                 /* MMCM locked: PL memories may be accessed */
 void dac_play(int on);
+void dac_write_iq(const s16 *i, const s16 *q);   /* NSAMP samples each: DAC_A = I, DAC_B = Q */
 void wave_sine(double f_hz);
 void wave_chirp(double f0_hz, double f1_hz);
 int  capture(void);                     /* 0 = new samples in all four channels */

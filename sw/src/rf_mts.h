@@ -16,5 +16,7 @@ void rf_status(void);
 int  rf_mts(void);              /* 0 = both DAC and ADC groups synchronized */
 void rf_reset_tiles(void);      /* restart tiles 0 and 2: alignment is lost */
 int  rf_mts_done(void);
+/* coarse delay of one converter in RFDC steps (0..40); type XRFDC_ADC_TILE / XRFDC_DAC_TILE */
+int  rf_coarse_delay(u32 type, u32 tile, u32 block, u32 steps);
 
 #endif

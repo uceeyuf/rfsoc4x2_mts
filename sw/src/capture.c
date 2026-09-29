@@ -205,3 +205,12 @@ void analyze(double *lag_out)
             *lag_out = lag;
     }
 }
+
+double measure_lag(void)
+{
+    int inv;
+    capture();
+    if (rms(buf[0]) < 300 || rms(buf[2]) < 300)
+        return NAN;
+    return xcorr_lag(buf[2], buf[0], &inv);
+}

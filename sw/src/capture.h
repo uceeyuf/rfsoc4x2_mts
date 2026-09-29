@@ -26,5 +26,6 @@ int  capture(void);                     /* 0 = new samples in all four channels 
 /* print level per channel and the delay of every active channel vs. the reference one */
 void analyze(double *lag_out);          /* lag_out: delay of ADC_D vs ADC_B in samples */
 const s16 *capture_data(int ch);
+double measure_lag(void);               /* capture, delay of ADC_D vs ADC_B in samples, no print */
 
 #endif

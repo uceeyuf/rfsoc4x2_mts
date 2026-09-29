@@ -18,6 +18,7 @@
 #include "LMK_LMX.h"
 #include "rf_mts.h"
 #include "capture.h"
+#include "align.h"
 
 static int playing;
 
@@ -25,7 +26,8 @@ static void help(void)
 {
     xil_printf("\r\nkeys: 1 sine 250 MHz | 2 chirp 100 MHz -> 1.5 GHz | p DAC play on/off\r\n"
                "      c capture + measure | m run MTS | r restart tiles (clears MTS)\r\n"
-               "      x experiment: 5 x (restart, capture, MTS, capture) | s status | h help\r\n"
+               "      a align by training (after MTS) | d coarse delay sweep\r\n"
+               "      x experiment: 5 x (restart, measure, MTS, measure, align) | s status | h help\r\n"
                "      k reprogram the clock chips (if LMK PLL1 was still settling at power-on)\r\n"
                "wiring: DAC_A -> ADC_B, DAC_B -> ADC_D\r\n\r\n");
 }
@@ -48,19 +50,22 @@ static void measure(double *lag)
 
 static void experiment(void)
 {
-    double before[5], after[5];
+    double before[5], after[5], aligned[5];
     for (int i = 0; i < 5; i++) {
         before[i] = after[i] = 1e9;
         rf_reset_tiles();
+        align_clear();
         usleep(200000);
         measure(&before[i]);
         rf_mts();
         usleep(200000);
         measure(&after[i]);
+        align_train();
+        aligned[i] = align_residual();
     }
-    xil_printf("\r\nrun | ADC_D vs ADC_B without MTS | with MTS  (samples, 1 sample = 250 ps)\r\n");
+    xil_printf("\r\nrun | ADC_D vs ADC_B without MTS | with MTS   | MTS + align  (samples, 1 sample = 250 ps)\r\n");
     for (int i = 0; i < 5; i++)
-        printf(" %d  | %+10.3f                 | %+10.3f\r\n", i + 1, before[i], after[i]);
+        printf(" %d  | %+10.3f                 | %+10.3f | %+10.3f\r\n", i + 1, before[i], after[i], aligned[i]);
 }
 
 int main(void)
@@ -90,7 +95,9 @@ int main(void)
         case 'p': dac_play(playing = !playing); xil_printf("DAC play %s\r\n", playing ? "on" : "off"); break;
         case 'c': measure(0); break;
         case 'm': rf_mts(); break;
-        case 'r': rf_reset_tiles(); break;
+        case 'r': rf_reset_tiles(); align_clear(); break;
+        case 'a': align_train(); break;
+        case 'd': align_sweep(); break;
         case 'x': experiment(); break;
         case 's': rf_status(); break;
         case 'k':

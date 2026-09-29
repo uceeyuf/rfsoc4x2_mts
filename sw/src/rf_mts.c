@@ -135,3 +135,17 @@ void rf_reset_tiles(void)
 }
 
 int rf_mts_done(void) { return mts_ok; }
+
+int rf_coarse_delay(u32 type, u32 tile, u32 block, u32 steps)
+{
+    /* the 4 GSPS ADCs take the new value on a tile event, the DACs at once */
+    int hs = (type == XRFDC_ADC_TILE) && XRFdc_IsHighSpeedADC(&rfdc, tile);
+    XRFdc_CoarseDelay_Settings s;
+    s.CoarseDelay = steps;
+    s.EventSource = hs ? XRFDC_EVNT_SRC_TILE : XRFDC_EVNT_SRC_IMMEDIATE;
+    if (XRFdc_SetCoarseDelaySettings(&rfdc, type, tile, block, &s) != XRFDC_SUCCESS)
+        return -1;
+    if (hs && XRFdc_UpdateEvent(&rfdc, type, tile, block, XRFDC_EVENT_CRSE_DLY) != XRFDC_SUCCESS)
+        return -1;
+    return 0;
+}

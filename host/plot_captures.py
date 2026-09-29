@@ -2,6 +2,7 @@
 
     python host/plot_captures.py out                     # one capture set
     python host/plot_captures.py out_nomts out_mts       # without / with MTS
+    python host/plot_captures.py out_nomts out_mts out_align   # + alignment
 
 Copyright (c) 2026, Yijie Yu. BSD-3-Clause.
 """
@@ -35,7 +36,8 @@ plt.rcParams.update({'font.family': 'Segoe UI', 'font.size': 10, 'text.color': I
                      'ytick.color': MUTED, 'axes.facecolor': SURF, 'figure.facecolor': SURF})
 
 dirs = sys.argv[1:] or ['out']
-titles = {0: 'without MTS', 1: 'with MTS'} if len(dirs) == 2 else {}
+titles = {2: {0: 'without MTS', 1: 'with MTS'},
+          3: {0: 'without MTS', 1: 'with MTS', 2: 'MTS + alignment'}}.get(len(dirs), {})
 fig, axes = plt.subplots(len(dirs), 1, figsize=(9, 2.9 * len(dirs)), squeeze=False, sharex=True)
 for i, (ax, d) in enumerate(zip(axes[:, 0], dirs)):
     b, dd = load(d, 'adc_b'), load(d, 'adc_d')
@@ -46,7 +48,7 @@ for i, (ax, d) in enumerate(zip(axes[:, 0], dirs)):
     t = np.arange(n) / FS * 1e9
     ax.plot(t, b[s:s + n] / 32768, color=C_B, lw=2, label='ADC_B (tile 226) <- DAC_A (tile 230)')
     ax.plot(t, dd[s:s + n] / 32768, color=C_D, lw=2, label='ADC_D (tile 224) <- DAC_B (tile 228)')
-    ax.set_title('%s: ADC_D vs ADC_B  %+.2f samples (%+.0f ps)' % (titles.get(i, d), lag, lag * 250),
+    ax.set_title('%s: ADC_D vs ADC_B  %+.3f samples (%+.1f ps)' % (titles.get(i, d), lag, lag * 250),
                  loc='left', fontsize=11, color=INK)
     ax.grid(axis='y', color=GRID, lw=0.8)
     ax.set_axisbelow(True)

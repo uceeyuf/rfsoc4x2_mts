@@ -22,7 +22,7 @@
   <text class="t" x="85" y="143">PS (A53)</text>
   <text class="x" x="85" y="166">SPI0: LMK04828 +</text>
   <text class="x" x="85" y="181">2 x LMX2594, 500 MHz</text>
-  <text class="x" x="85" y="203">RFDC start-up + MTS</text>
+  <text class="x" x="85" y="203">RFDC, MTS + alignment</text>
   <text class="x" x="85" y="225">waveform, capture,</text>
   <text class="x" x="85" y="240">delay measurement</text>
   <text class="x" x="85" y="262">JTAG + UART1</text>

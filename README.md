@@ -11,7 +11,7 @@ Multi-tile synchronization (MTS) of the RF data converter on the RFSoC 4x2, bare
 
 On top of MTS, a wideband chirp training sequence and a sub-sample cross-correlation estimator measure the residual skew between the channels, and a closed-loop correction with the RFDC coarse delay removes it to the nearest sample.
 
-Measured on the board: without MTS the delay changes by up to about 100 samples every time the tiles restart; with MTS at most **one sample (250 ps)** is left, and a short training after MTS removes that too: **−0.002 samples (−0.5 ps)** in every run. Over the I/Q OFDM link that one sample is the difference between a broken 16-QAM (EVM −5.7 dB) and an error-free one (−28 dB); after alignment QPSK to 64-QAM run error-free and 256-QAM reaches 11.58 Gb/s at a BER of 10⁻⁴ to 3 × 10⁻³.
+Measured on the board: without MTS the delay changes by up to about 100 samples every time the tiles restart; with MTS at most **one sample (250 ps)** is left, and a short training after MTS removes that too: **−0.002 samples (−0.5 ps)** in every run. Over the I/Q OFDM link that one sample is the difference between a broken 16-QAM (EVM −5.7 dB) and an error-free one (−28 dB). The OFDM baseband grew into **Modem 2**, a modem for two independent ends, in [zcu208_4gsps_ofdm](https://github.com/uceeyuf/zcu208_4gsps_ofdm#modem-2-two-independent-ends).
 
 　
 
@@ -80,16 +80,9 @@ Board results, key `f` (restart tiles, then without MTS / with MTS / MTS + align
 
 **One sample (250 ps) of I/Q offset is enough to break 16-QAM with a linear equalizer**: the I/Q image rises to 7.9 dB below the signal. After the training alignment the image is 34 dB down and the plain equalizer works. The widely linear equalizer also recovers small offsets (inside the cyclic prefix), but a baseband handed to an external I/Q modulator needs I and Q aligned at the converters.
 
-After MTS + alignment (fresh start), all modulations:
+Full log: [docs/results/ofdm_log.txt](./docs/results/ofdm_log.txt).
 
-| Modulation | PHY rate | Linear EQ: EVM, bit errors | Widely linear EQ: EVM, bit errors |
-| :-: | :-: | :-: | :-: |
-| QPSK | 2.89 Gb/s | −28.2 dB, 0 / 23712 | −28.7 dB, 0 / 23712 |
-| 16-QAM | 5.79 Gb/s | −28.9 dB, 0 / 47424 | −30.7 dB, 0 / 47424 |
-| 64-QAM | 8.68 Gb/s | −25.5 dB, 0 / 71136 | −28.1 dB, 1 / 71136 |
-| 256-QAM | 11.58 Gb/s | −28.1 dB, 82 / 94848 | −30.2 dB, 12 / 94848 |
-
-EVM varies by about ±1.5 dB from capture to capture (−28 to −33 dB with the widely linear equalizer); 256-QAM runs at a BER of 10⁻⁴ to 3 × 10⁻³. The floor is set by the loopback itself: it does not move between 0.10 and 0.30 FS RMS. The rates are the PHY rate of the played buffer, demodulated offline on the A53, not a streaming link. Full log: [docs/results/ofdm_log.txt](./docs/results/ofdm_log.txt).
+**Modem 2.** This OFDM baseband grew into Modem 2 ([zcu208_4gsps_ofdm](https://github.com/uceeyuf/zcu208_4gsps_ofdm#modem-2-two-independent-ends)): the transmitter in the FPGA, a receiver built for two independent ends (an RF pilot tone for the carrier offset and phase noise, sample-clock tracking, blind I/Q correction, a widely linear combiner on a channel smoothed across sub-carriers). Over the same loopback at 2 GSPS, 16-QAM: EVM −29.4 dB, 4 bit errors in 800 M bits. One of its findings concerns these converters: the ADCs' background calibration (time skew, gain) converges better with a strong low-frequency tone in the input; converged on such a tone and then frozen, the same frames give −33.2 dB.
 
 | ![ofdm](./docs/img/ofdm_const.png)                                                      |
 | :-------------------------------------------------------------------------------------: |
@@ -156,7 +149,7 @@ URAM player / capture blocks and the design approach: [Xilinx/RFSoC-MTS](https:/
 
 在 MTS 之上，用宽带 chirp 训练序列和亚采样点精度的互相关估计器测量两路之间剩余的偏差，再用 RFDC 粗延迟做闭环校正，精确到一个采样点。
 
-上板实测：不开 MTS 时每次重启 tile 延迟变化可达约 100 个采样点；开 MTS 后最多剩 **一个采样点（250 ps）**，MTS 后再做一次训练对齐，每次都是 **−0.002 个采样点（−0.5 ps）**。在 I/Q OFDM 链路上，这一个采样点决定了 16-QAM 是完全解不出（EVM −5.7 dB）还是零误码（−28 dB）；对齐之后 QPSK 到 64-QAM 零误码，256-QAM 达到 11.58 Gb/s，误码率 10⁻⁴ 到 3 × 10⁻³。
+上板实测：不开 MTS 时每次重启 tile 延迟变化可达约 100 个采样点；开 MTS 后最多剩 **一个采样点（250 ps）**，MTS 后再做一次训练对齐，每次都是 **−0.002 个采样点（−0.5 ps）**。在 I/Q OFDM 链路上，这一个采样点决定了 16-QAM 是完全解不出（EVM −5.7 dB）还是零误码（−28 dB）。这个 OFDM 基带后来发展成 **Modem 2**，一个面向两端独立链路的调制解调，见 [zcu208_4gsps_ofdm](https://github.com/uceeyuf/zcu208_4gsps_ofdm#modem-2两端独立)。
 
 　
 
@@ -225,16 +218,9 @@ MTS 延迟：DAC 120 / 120（偏移 0 / 8），ADC 88 / 88（偏移 0 / 0）。�
 
 **I/Q 只差一个采样点（250 ps），线性均衡就解不了 16-QAM**：I/Q 镜像只比信号低 7.9 dB。训练对齐之后镜像低 34 dB，普通均衡即可工作。宽线性均衡也能救回较小的偏差（在循环前缀以内），但要把基带交给外部 IQ 调制器，I 和 Q 必须在转换器处就对齐。
 
-MTS + 对齐之后（重新加载程序），各种调制：
+完整日志：[docs/results/ofdm_log.txt](./docs/results/ofdm_log.txt)。
 
-| 调制 | 物理层速率 | 线性均衡：EVM、误码 | 宽线性均衡：EVM、误码 |
-| :-: | :-: | :-: | :-: |
-| QPSK | 2.89 Gb/s | −28.2 dB，0 / 23712 | −28.7 dB，0 / 23712 |
-| 16-QAM | 5.79 Gb/s | −28.9 dB，0 / 47424 | −30.7 dB，0 / 47424 |
-| 64-QAM | 8.68 Gb/s | −25.5 dB，0 / 71136 | −28.1 dB，1 / 71136 |
-| 256-QAM | 11.58 Gb/s | −28.1 dB，82 / 94848 | −30.2 dB，12 / 94848 |
-
-每次采集之间 EVM 有约 ±1.5 dB 的波动（宽线性均衡 −28 到 −33 dB）；256-QAM 的误码率在 10⁻⁴ 到 3 × 10⁻³ 之间。这个底限来自环回本身：发射电平在 0.10 到 0.30 FS RMS 之间变化时它不动。表中速率是循环播放缓冲的物理层速率、由 A53 离线解调，不是实时流。完整日志：[docs/results/ofdm_log.txt](./docs/results/ofdm_log.txt)。
+**Modem 2。** 这个 OFDM 基带后来发展成 Modem 2（[zcu208_4gsps_ofdm](https://github.com/uceeyuf/zcu208_4gsps_ofdm#modem-2两端独立)）：发射机在 FPGA 内，接收机按两端独立设计（射频导频单音跟踪载波频偏和相位噪声、采样时钟跟踪、盲 I/Q 校正、在子载波间平滑过的信道上做宽线性合并）。在同一环回上以 2 GSPS 传 16-QAM：EVM −29.4 dB，8 亿 bit 中 4 个比特错。其中一个发现与这些转换器有关：ADC 的后台校准（时间偏斜、增益）在输入里有强的低频单音时收敛得更好；在这样的单音上收敛后冻结，同样的帧可达 −33.2 dB。
 
 | ![ofdm](./docs/img/ofdm_const.png)                                   |
 | :------------------------------------------------------------------: |
